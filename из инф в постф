@@ -1,0 +1,112 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+typedef struct stack_node 
+{
+	char chr;
+	struct stack_node* next;
+} stack_node;
+
+typedef struct stack
+{
+	struct stack_node* head;
+} stack;
+
+stack* create_stack() 
+{
+	stack* s = (stack*)malloc(sizeof(stack));
+	s->head = NULL;
+	return s;
+}
+
+void push(stack* s, char chr)
+{
+	stack_node* p = (stack_node*)malloc(sizeof(stack_node));
+	p->chr = chr;
+	p->next = s->head;
+	s->head = p;
+}
+
+
+char pop(stack* s)
+{
+	char gg = s->head->chr;
+	stack_node* p = s->head;
+	s->head = p->next;
+	free(p);
+	return gg;
+}
+
+int eempty(stack* s) 
+{
+	return(s->head == NULL);
+}
+
+
+char top(stack* s) 
+{
+	return s->head->chr;
+}
+
+const char prior[] = "()-+*/";
+
+int pr_of(char buf) 
+{
+	for (int i = 0; prior[i] != 0; i++) 
+	{
+		if (buf == prior[i]) return i / 2;
+	}
+	return -1;
+}
+
+int main()
+{
+	stack* s = create_stack();
+	char str[1000] = { 0 };
+	gets(str);
+	int i = 0;
+	while (str[i] != 0) {
+	switch (str[i]) {
+	case '(': 
+	{
+	push(s, str[i]);
+	break;
+	}
+	case ')': 
+	{
+	while (top(s) != '(') 
+	{
+	printf("%c", pop(s));
+	}
+	pop(s);
+	break;
+	}
+	case '+':
+	case '-':
+	case '*':
+	case '/': 
+	{
+	int pr = pr_of(str[i]);
+	while (!eempty(s) && pr <= pr_of(top(s))) 
+	{
+	printf("%c", pop(s));
+	}
+	push(s, str[i]);
+	break;
+	}
+default:
+{
+	printf("%c", str[i]);
+	break;
+}
+	}
+	i++;
+	}
+while (!eempty(s))
+{
+	printf("%c", pop(s));
+}
+return 0;
+}
